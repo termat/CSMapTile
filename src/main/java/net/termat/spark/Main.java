@@ -29,6 +29,7 @@ public class Main {
 		get("/csmap/:z/:x/:y", (request, response) -> {
 			try{
 				Integer zz=Integer.parseInt(request.params("z"));
+				if(zz>15)return null;
 				Integer xx=Integer.parseInt(request.params("x"));
 				Integer yy=Integer.parseInt(request.params("y"));
 				byte[] rawImage =db.getTile(Tile.TYPE_CS, zz, xx, yy);
@@ -50,6 +51,7 @@ public class Main {
 		get("/jshis/:z/:x/:y", (request, response) -> {
 			try{
 				Integer zz=Integer.parseInt(request.params("z"));
+				if(zz>15)return null;
 				Integer xx=Integer.parseInt(request.params("x"));
 				Integer yy=Integer.parseInt(request.params("y"));
 				byte[] rawImage =db.getTile(Tile.TYPE_JSHIS, zz, xx, yy);
@@ -71,6 +73,7 @@ public class Main {
 		get("/compo/:z/:x/:y", (request, response) -> {
 			try{
 				Integer zz=Integer.parseInt(request.params("z"));
+				if(zz>15)return null;
 				Integer xx=Integer.parseInt(request.params("x"));
 				Integer yy=Integer.parseInt(request.params("y"));
 				byte[] rawImage =db.getTile(Tile.TYPE_COMPO, zz, xx, yy);

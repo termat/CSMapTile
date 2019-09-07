@@ -1,6 +1,9 @@
 package net.termat.geo.xmap;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -49,6 +52,7 @@ public class MapPanel2d extends JPanel {
 		mapkit.setCenterPosition(gp);
 		mapkit.setZoomSliderVisible(false);
 		mapkit.setZoomButtonsVisible(false);
+		mapkit.setMiniMapVisible(false);
 	}
 
 	public void setTilefactoryInfo(TileFactoryInfo info){
@@ -56,4 +60,21 @@ public class MapPanel2d extends JPanel {
 		mapkit.setTileFactory(tileFactory);
 		mapkit.updateUI();
 	}
+
+	public BufferedImage getImage(){
+		BufferedImage img=new BufferedImage(mapkit.getWidth(),mapkit.getHeight(),BufferedImage.TYPE_INT_RGB);
+		Graphics2D g=img.createGraphics();
+		this.paint(g);
+		g.dispose();
+		getRectangleLonLat();
+		return img;
+	}
+
+	private void getRectangleLonLat(){
+		System.out.println(mapkit.getMainMap().getViewportBounds());
+		GeoPosition topleft=mapkit.getMainMap().convertPointToGeoPosition(new Point2D.Double(0,0));
+		GeoPosition bottomright=mapkit.getMainMap().convertPointToGeoPosition(new Point2D.Double(mapkit.getWidth()-1,mapkit.getHeight()-1));
+		System.out.println(topleft.getLatitude()+","+topleft.getLongitude()+","+bottomright.getLatitude()+","+bottomright.getLongitude());
+	}
+
 }

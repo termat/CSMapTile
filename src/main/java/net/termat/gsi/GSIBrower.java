@@ -1,12 +1,18 @@
 package net.termat.gsi;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -63,6 +69,22 @@ public class GSIBrower {
 			}
 		});
 		tool.add(combo);
+		tool.addSeparator();
+		JButton bt=new JButton("出力");
+		bt.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				BufferedImage img=map.getImage();
+				File out=new File("C:/Users/t-matsuoka/Desktop/out.png");
+				try{
+					System.out.println("out!");
+					ImageIO.write(img, "png", out);
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
+			}
+		});
+		tool.add(bt);
 		tool.addSeparator();
 		return tool;
 	}

@@ -6,8 +6,10 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -48,6 +50,7 @@ public class TileDB {
 	private static int[] col=new int[]{255,232,197};
 
 	private float transparency=0.9f;
+	private static int timeout=20000;
 
 	/**
 	 * DB接続
@@ -135,21 +138,11 @@ public class TileDB {
 	 */
 	public BufferedImage getCSImage(int zoom,int tileX,int tileY)throws IOException{
 		String param="/"+zoom+"/"+tileX+"/"+tileY;
-		BufferedImage s_img=ImageIO.read(new URL(slope+param+".png"));
+		URL url=new URL(slope+param+".png");
+		BufferedImage s_img=readImage(url);
 		s_img=getColorTransSlope(s_img);
 		BufferedImage d_img=null;
 		d_img=createDemTile(zoom,tileX,tileY);
-		/*
-		if(zoom<=14){
-			d_img=ImageIO.read(new URL(dem14+param+".png"));
-		}else{
-			try{
-				d_img=ImageIO.read(new URL(dem15a+param+".png"));
-			}catch(IOException e){
-				d_img=ImageIO.read(new URL(dem15b+param+".png"));
-			}
-		}
-		*/
 		BufferedImage c_img=getCurve(d_img,zoom);
 		BufferedImage img=mul(c_img,s_img);
 		return img;
@@ -185,16 +178,25 @@ public class TileDB {
 		String param="/"+zoom+"/"+tileX+"/"+tileY;
 		BufferedImage d_img=null;
 		if(zoom<=14){
-			d_img=ImageIO.read(new URL(dem14+param+".png"));
+			d_img=readImage(new URL(dem14+param+".png"));
 		}else{
 			try{
-				d_img=ImageIO.read(new URL(dem15a+param+".png"));
+				d_img=readImage(new URL(dem15a+param+".png"));
 			}catch(IOException e){
-				d_img=ImageIO.read(new URL(dem15b+param+".png"));
+				d_img=readImage(new URL(dem15b+param+".png"));
 			}
 		}
 		return d_img;
 	}
+
+	private static BufferedImage readImage(URL url)throws IOException{
+		URLConnection con=url.openConnection();
+        con.setConnectTimeout(timeout);
+        con.setReadTimeout(timeout);
+		BufferedImage img=ImageIO.read(con.getInputStream());
+		return img;
+	}
+
 
 	/*
 	 * 傾斜量図の色変換
@@ -304,7 +306,6 @@ public class TileDB {
 			}
 		}
 		return ret.getSubimage(1, 1, 256, 256);
-//		return ret;
 	}
 
 	/*
@@ -339,6 +340,18 @@ public class TileDB {
 		double ex1=p[1][0]+p[1][2]-2*p[1][1];
 		double ex2=p[0][1]+p[2][1]-2*p[1][1];
 		return (ex1+ex2)/(ll*ll)*100;
+	}
+
+	public static void main(String[] args){
+		TileDB db=new TileDB();
+		try{
+			db.connectDB("tile.db", true);
+			File f=new File("C:/Users/t-matsuoka/Desktop/cs2.png");
+			BufferedImage cu=db.getCSImage(15, 28306, 13213);
+			ImageIO.write(cu, "png", f);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 }
